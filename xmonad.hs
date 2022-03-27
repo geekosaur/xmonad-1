@@ -508,10 +508,11 @@ main = do
         , focusedBorderColor = myFocusColor
         , logHook = dynamicLogWithPP $ namedScratchpadFilterOutWorkspacePP $ xmobarPP
         } `additionalKeysP` myKeys
-  launcherHook :: ManageHook
-  launcherHook = resource =? launcherString --> doIgnore
 
-  eventLogHookForPolyBar = do
+launcherHook :: ManageHook
+launcherHook = resource =? launcherString --> doIgnore
+
+eventLogHookForPolyBar = do
    winset <- gets windowset
    let layout = description . W.layout . W.workspace . W.current $ winset
 
