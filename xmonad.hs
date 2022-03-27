@@ -490,9 +490,8 @@ main :: IO ()
 main = do
     forM_ [".xmonad-layout-log"] $ \file -> safeSpawn "mkfifo" ["/tmp/" ++ file]
     -- the xmonad, ya know...what the WM is named after!
-    xmonad $ ewmh def
-        { manageHook         = myManageHook <+> manageDocks <+> launcherHook
-        , handleEventHook    = docksEventHook
+    xmonad $ docks $ ewmh def
+        { manageHook         = myManageHook
                                -- Uncomment this line to enable fullscreen support on things like YouTube/Netflix.
                                -- This works perfect on SINGLE monitor systems. On multi-monitor systems,
                                -- it adds a border around the window if screen does not have focus. So, my solution
@@ -506,12 +505,10 @@ main = do
         , borderWidth        = myBorderWidth
         , normalBorderColor  = myNormColor
         , focusedBorderColor = myFocusColor
-        , logHook = dynamicLogWithPP $ namedScratchpadFilterOutWorkspacePP $ xmobarPP
+        , logHook = dynamicLogWithPP $ namedScratchpadFilterOutWorkspacePP $ xmobarPP <+> eventLogHookForPolybar
         } `additionalKeysP` myKeys
 
-launcherHook :: ManageHook
-launcherHook = resource =? launcherString --> doIgnore
-
+eventLogHookForPolyBar :: X ()
 eventLogHookForPolyBar = do
    winset <- gets windowset
    let layout = description . W.layout . W.workspace . W.current $ winset
