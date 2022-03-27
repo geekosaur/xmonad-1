@@ -16,9 +16,6 @@ import XMonad.Actions.SpawnOn
 import XMonad.Util.NamedScratchpad
 import XMonad.Util.EZConfig(additionalKeysP)
 import XMonad.Layout.WindowNavigation
-import qualified DBus as D
-import qualified DBus.Client as D
-import qualified Codec.Binary.UTF8.String as UTF8
 import Graphics.X11.ExtraTypes.XF86
 import XMonad.Actions.CycleWS
 import Data.Monoid
@@ -273,36 +270,19 @@ myLayoutHook = avoidStruts (
 delta = 3/100 
 ----Main Function
 main :: IO ()
-main = do
-    dbus <- D.connectSession
-    -- Request access to the DBus name
-    D.requestName dbus (D.busName_ "org.xmonad.Log")
-        [D.nameAllowReplacement, D.nameReplaceExisting, D.nameDoNotQueue]
-
-    xmonad $ewmh $ docks $ defaults { logHook = dynamicLogWithPP (myLogHook dbus) }
+main =
+    xmonad $ewmh $ docks $ defaults { logHook = dynamicLogWithPP myLogHook }
 
 -- Override the PP values as you would otherwise, adding colors etc depending
 -- on  the statusbar used
-myLogHook :: D.Client -> PP
-myLogHook dbus = def
-    { ppOutput = dbusOutput dbus
-    , ppCurrent = wrap ("%{F" ++ blue ++ "} ") " %{F-}"
+myLogHook :: PP
+myLogHook = def
+    { ppCurrent = wrap ("%{F" ++ blue ++ "} ") " %{F-}"
     , ppVisible = wrap ("%{F" ++ gray ++ "} ") " %{F-}"
     , ppUrgent = wrap ("%{F" ++ red ++ "} ") " %{F-}"
     , ppHidden = wrap ("%{F" ++ gray ++ "} ") " %{F-}"
     , ppTitle = wrap ("%{F" ++ gray2 ++ "} ") " %{F-}"
     }
--- Emit a DBus signal on log updates
-dbusOutput :: D.Client -> String -> IO ()
-dbusOutput dbus str = do
-    let signal = (D.signal objectPath interfaceName memberName) {
-            D.signalBody = [D.toVariant $ UTF8.decodeString str]
-        }
-    D.emit dbus signal
-  where
-    objectPath = D.objectPath_ "/org/xmonad/Log"
-    interfaceName = D.interfaceName_ "org.xmonad.Log"
-    memberName = D.memberName_ "Update"
 
 defaults = def{
     modMask= mod4Mask
