@@ -303,7 +303,7 @@ myLayoutHook = avoidStruts $ mouseResize $ windowArrange $ T.toggleLayouts float
                $ mkToggle (NBFULL ?? NOBORDERS ?? EOT) myDefaultLayout
              where
                myDefaultLayout =     withBorder myBorderWidth tall
-                                 ||| magnify
+                                 ||| Main.magnify
                                  ||| noBorders monocle
                                  ||| floats
                                  ||| noBorders tabs
