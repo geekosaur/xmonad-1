@@ -503,7 +503,7 @@ main = do
         , borderWidth        = myBorderWidth
         , normalBorderColor  = myNormColor
         , focusedBorderColor = myFocusColor
-        , logHook = (dynamicLogWithPP $ namedScratchpadFilterOutWorkspacePP $ xmobarPP) <+> eventLogHookForPolyBar
+        , logHook = dynamicLogWithPP (namedScratchpadFilterOutWorkspacePP xmobarPP) <+> eventLogHookForPolyBar
         } `additionalKeysP` myKeys
 
 eventLogHookForPolyBar :: X ()
